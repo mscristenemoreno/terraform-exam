@@ -7,7 +7,7 @@ variable "aws_region" {
 
 variable "default_tags" {
   description = "Tags set for modules"
-  type = map(string)
+  type        = map(string)
   default = {
     project     = "terraform-exam"
     environment = "dev"
