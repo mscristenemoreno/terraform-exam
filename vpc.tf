@@ -5,15 +5,28 @@ provider "aws" {
 }
 
 module "vpc" {
-  source     = "terraform-aws-modules/vpc/aws"
-  create_vpc = false
+  source = "terraform-aws-modules/vpc/aws"
+  version    = "3.11.0"
+
+  create_vpc = true
 
   name = "dev-vpc"
-  cidr = "172.31.0.0/16"
+  cidr = "20.0.0.0/16"
 
-  manage_default_vpc               = true
-  default_vpc_name                 = "default-vpc"
-  default_vpc_enable_dns_hostnames = true
+  azs             = ["${var.aws_region}a", "${var.aws_region}b"]
+  private_subnets = ["20.0.1.0/24", "20.0.2.0/24"]
+  public_subnets  = ["20.0.10.0/24", "20.0.20.0/24"]
+
+  enable_nat_gateway = false
+  enable_vpn_gateway = true
+
+  public_subnet_tags = {
+    Name = "dev-vpc-public-subnet"
+  }
+
+  private_subnet_tags = {
+    Name = "dev-vpc-private-subnet"
+  }
 
   tags = merge(var.default_tags)
 }
