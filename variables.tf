@@ -5,11 +5,19 @@ variable "aws_region" {
   default = "ap-southeast-1"
 }
 
-variable "default_tags" {
-  description = "Tags set for modules"
-  type        = map(string)
-  default = {
-    project     = "terraform-exam"
-    environment = "dev"
-  }
+variable "environment_tag" {}
+
+variable "common_tags" {
+  default = {}
+}
+variable "network_address_space" {
+  default = "20.0.0.0/16"
+}
+
+variable "instance_count" {
+  default = 1
+}
+
+variable "subnet_count" {
+  default = 2
 }
