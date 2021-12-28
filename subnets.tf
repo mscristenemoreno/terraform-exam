@@ -1,5 +1,5 @@
-module "subnets" {
-  source             = "clouddrove/terraform-aws-subnet/aws"
+module "subnet" {
+  source             = "clouddrove/subnet/aws"
   version            = "0.15.0"
   name               = "subnets"
   environment        = "dev"

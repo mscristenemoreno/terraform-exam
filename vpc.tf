@@ -17,3 +17,5 @@ module "vpc" {
 
   tags = merge(var.default_tags)
 }
+
+
