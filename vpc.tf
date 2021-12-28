@@ -5,8 +5,8 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-  version    = "3.11.0"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.11.0"
 
   create_vpc = true
 
