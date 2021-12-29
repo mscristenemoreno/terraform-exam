@@ -1,31 +1,11 @@
-resource "aws_security_group" "sg" {
-  name   = "${local.env_name}-sg"
-  vpc_id = module.vpc.vpc_id
-
-  ingress {
-    protocol  = -1
-    self      = true
-    from_port = 0
-    to_port   = 0
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
+# INTERNET GATEWAY #
 resource "aws_internet_gateway" "igw" {
   vpc_id = module.vpc.vpc_id
 
   tags = merge(local.common_tags, { Name = "${var.environment_tag}-igw" })
 }
 
-variable "environment_tag-subnet" {
-  default = ""
-}
+# SUBNETS #
 resource "aws_subnet" "subnet" {
   count             = var.subnet_count
   cidr_block        = cidrsubnet(var.network_address_space, 8, count.index)
@@ -35,6 +15,7 @@ resource "aws_subnet" "subnet" {
   tags = merge(local.common_tags, { Name = "${var.environment_tag}-subnet${count.index + 1}" })
 }
 
+# ROUTE TABLES #
 resource "aws_route_table" "rtb" {
   vpc_id = module.vpc.vpc_id
 
@@ -51,5 +32,32 @@ resource "aws_route_table_association" "rta-subnet" {
   subnet_id      = aws_subnet.subnet[count.index].id
   route_table_id = aws_route_table.rtb.id
 }
+
+/*
+# SECURITY GROUPS #
+resource "aws_security_group" "alb_sg" {
+  name   = "web-app-alb-ssg"
+  vpc_id = module.vpc.vpc_id
+
+  # HTTP access from anywhere
+  ingress {
+    protocol  = "tcp"
+    from_port = 80
+    to_port   = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow all outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.environment_tag}-web-app-alb-sg" })
+}
+*/
+
 
 
