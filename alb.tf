@@ -6,8 +6,8 @@ module "alb" {
 
   load_balancer_type = "application"
 
-  vpc_id = module.vpc.vpc_id
-  #subnets            = [aws_subnet.subnet.id]
+  vpc_id  = module.vpc.vpc_id
+  subnets = [module.vpc.private_subnets[0], module.vpc.public_subnets[1]]
   #security_groups    = [aws_security_group.alb_sg.id]
   security_groups = [module.security_group.security_group_id]
 
@@ -47,5 +47,5 @@ module "alb" {
     }
   ]
 
-  tags = merge(local.common_tags, { Name = "${var.environment_tag}-web-app-alb" })
+  tags = merge(local.common_tags, { Name = "${var.environment_tag}-alb-web-app" })
 }

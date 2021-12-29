@@ -9,7 +9,7 @@ variable "network_address_space" {
 }
 
 variable "instance_size" {
-  default = "t2.micro"
+  default = "t3.medium"
 }
 
 variable "instance_count" {
