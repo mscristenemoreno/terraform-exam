@@ -1,3 +1,5 @@
 # terraform-exam
 
-This repository is for exam purposes.
+Practical exam (repo 1)
+
+This repository is for learning purposes.
