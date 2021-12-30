@@ -1,13 +1,16 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  name    = "${local.env_name}-vpc"
+  name    = "eks-vpc"
   version = "3.11.0"
 
   cidr = var.network_address_space
 
-  azs             = ["${var.aws_region}a", "${var.aws_region}b"]
-  private_subnets = ["20.0.1.0/24", "20.0.2.0/24"]
-  public_subnets  = ["20.0.10.0/24", "20.0.20.0/24"]
+  azs              = ["${var.aws_region}a", "${var.aws_region}b"]
+  private_subnets  = ["20.0.1.0/24", "20.0.2.0/24"]
+  public_subnets   = ["20.0.10.0/24", "20.0.20.0/24"]
+  database_subnets = ["20.0.3.0/24", "20.0.4.0/24"]
+
+  create_database_subnet_group = true
 
   #azs             = ["${var.aws_region}a", "${var.aws_region}b", "${var.aws_region}c"]
   #private_subnets  = ["20.0.1.0/24", "20.0.2.0/24", "20.0.3.0/24"]

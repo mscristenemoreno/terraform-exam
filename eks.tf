@@ -11,7 +11,7 @@ module "eks" {
   worker_groups = [
     {
       name                          = "worker-group"
-      instance_type                 = var.instance_size
+      instance_type                 = aws_instance.ec2.instance_type
       asg_desired_capacity          = 1
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     }

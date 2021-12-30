@@ -1,10 +1,9 @@
 data "aws_availability_zones" "available" {}
 
-/*
 # AMI
 data "aws_ami" "amazon_linux" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
@@ -15,8 +14,12 @@ data "aws_ami" "amazon_linux" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
+
+  filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
 }
-*/
 
 # EKS
 data "aws_eks_cluster" "cluster" {

@@ -2,13 +2,12 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "web-app-alb"
+  name = "ingress-eks-alb"
 
   load_balancer_type = "application"
 
-  vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
-  #security_groups    = [aws_security_group.alb_sg.id]
+  vpc_id          = module.vpc.vpc_id
+  subnets         = module.vpc.public_subnets
   security_groups = [module.security_group.security_group_id]
 
   target_groups = [
@@ -19,11 +18,11 @@ module "alb" {
       target_type      = "instance"
       targets = [
         {
-          target_id = ""
+          target_id = aws_instance.ec2.id
           port      = 80
         },
         {
-          target_id = ""
+          target_id = aws_instance.ec2.id
           port      = 8080
         }
       ]
@@ -47,6 +46,6 @@ module "alb" {
     }
   ]
 
-  tags = merge(local.common_tags, { Name = "${var.environment_tag}-alb-web-app" })
+  tags = merge(local.common_tags, { Name = "ingress-alb-${var.environment_tag}" })
 }
 

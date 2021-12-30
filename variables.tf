@@ -64,8 +64,7 @@ variable "map_users" {
   ]
 }
 
-variable "common_tags" {
-  default = {}
-}
-
 variable "environment_tag" {}
+
+variable "username" {}
+variable "password" {}

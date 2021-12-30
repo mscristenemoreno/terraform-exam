@@ -50,65 +50,13 @@ resource "aws_security_group" "all_worker_mgmt" {
   }
 }
 
-/*
-# DEFINE A DEPLOYMENT
-resource "kubernetes_deployment" "eks_deploy" {
-  metadata {
-    name = "${var.environment_tag}-eks-deploy"
-    labels = {
-      dev = "${local.tags.Name}"
-    }
-  }
-  spec {
-    replicas = "2"
+# EC2
+resource "aws_instance" "ec2" {
+  ami                    = data.aws_ami.amazon_linux.id
+  instance_type          = var.instance_size
+  availability_zone      = element(module.vpc.azs, 0)
+  subnet_id              = element(module.vpc.private_subnets, 0)
+  vpc_security_group_ids = [module.security_group.security_group_id]
 
-    selector {
-      match_labels = {
-        dev = "${local.tags.Name}"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          dev = "${local.tags.Name}"
-        }
-      }
-      spec {
-        container {
-          image = "nginx:1.7.8"
-          name = "eks_deploy"
-
-          resources {
-            limits = {
-              cpu = "0.5"
-              memory = "512Mi"
-            }
-            requests = {
-              cpu = "250m"
-              memory = "50Mi"
-            }
-          }
-        }
-      }
-    }
-  }
+  tags = merge(local.common_tags, { Name = "${var.environment_tag}-rtb" })
 }
-
-resource "kubernetes_service" "eks_service" {
-  metadata {
-    name = "${var.environment_tag}-eks-service"
-  }
-  spec {
-    selector = {
-      dev = "${local.tags.Name}"
-    }
-    port {
-      port = 80
-      target_port = 80
-    }
-
-    type = "LoadBalancer"
-  }
-}
-*/
