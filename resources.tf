@@ -5,16 +5,6 @@ resource "aws_internet_gateway" "igw" {
   tags = merge(local.common_tags, { Name = "${var.environment_tag}-igw" })
 }
 
-# SUBNETS #
-resource "aws_subnet" "subnet" {
-  count             = var.subnet_count
-  cidr_block        = cidrsubnet(var.network_address_space, 8, count.index)
-  vpc_id            = module.vpc.vpc_id
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-
-  tags = merge(local.common_tags, { Name = "${var.environment_tag}-subnet${count.index + 1}" })
-}
-
 # ROUTE TABLES #
 resource "aws_route_table" "rtb" {
   vpc_id = module.vpc.vpc_id
@@ -27,37 +17,98 @@ resource "aws_route_table" "rtb" {
   tags = merge(local.common_tags, { Name = "${var.environment_tag}-rtb" })
 }
 
-resource "aws_route_table_association" "rta-subnet" {
-  count          = var.subnet_count
-  subnet_id      = aws_subnet.subnet[count.index].id
-  route_table_id = aws_route_table.rtb.id
+# SECURITY GROUPS #
+resource "aws_security_group" "worker_group_mgmt_one" {
+  name_prefix = "worker_group_mgmt_one"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "10.0.0.0/8",
+    ]
+  }
+}
+
+resource "aws_security_group" "all_worker_mgmt" {
+  name_prefix = "all_worker_management"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "10.0.0.0/8",
+      "172.16.0.0/12",
+      "192.168.0.0/16",
+    ]
+  }
 }
 
 /*
-# SECURITY GROUPS #
-resource "aws_security_group" "alb_sg" {
-  name   = "web-app-alb-ssg"
-  vpc_id = module.vpc.vpc_id
-
-  # HTTP access from anywhere
-  ingress {
-    protocol  = "tcp"
-    from_port = 80
-    to_port   = 80
-    cidr_blocks = ["0.0.0.0/0"]
+# DEFINE A DEPLOYMENT
+resource "kubernetes_deployment" "eks_deploy" {
+  metadata {
+    name = "${var.environment_tag}-eks-deploy"
+    labels = {
+      dev = "${local.tags.Name}"
+    }
   }
+  spec {
+    replicas = "2"
 
-  # Allow all outbound
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    selector {
+      match_labels = {
+        dev = "${local.tags.Name}"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          dev = "${local.tags.Name}"
+        }
+      }
+      spec {
+        container {
+          image = "nginx:1.7.8"
+          name = "eks_deploy"
+
+          resources {
+            limits = {
+              cpu = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu = "250m"
+              memory = "50Mi"
+            }
+          }
+        }
+      }
+    }
   }
+}
 
-  tags = merge(local.common_tags, { Name = "${var.environment_tag}-web-app-alb-sg" })
+resource "kubernetes_service" "eks_service" {
+  metadata {
+    name = "${var.environment_tag}-eks-service"
+  }
+  spec {
+    selector = {
+      dev = "${local.tags.Name}"
+    }
+    port {
+      port = 80
+      target_port = 80
+    }
+
+    type = "LoadBalancer"
+  }
 }
 */
-
-
-

@@ -7,13 +7,13 @@ module "alb" {
   load_balancer_type = "application"
 
   vpc_id  = module.vpc.vpc_id
-  subnets = [module.vpc.private_subnets[0], module.vpc.public_subnets[1]]
+  subnets = module.vpc.public_subnets
   #security_groups    = [aws_security_group.alb_sg.id]
   security_groups = [module.security_group.security_group_id]
 
   target_groups = [
     {
-      name_prefix      = "l1-"
+      name_prefix      = "lb-"
       backend_protocol = "HTTP"
       backend_port     = 80
       target_type      = "instance"
@@ -49,3 +49,4 @@ module "alb" {
 
   tags = merge(local.common_tags, { Name = "${var.environment_tag}-alb-web-app" })
 }
+
